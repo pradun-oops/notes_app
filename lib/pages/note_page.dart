@@ -4,8 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:notes/color/color_list.dart';
 import 'package:notes/helper/db_helper.dart';
 import 'package:notes/models/model.dart';
+import 'package:notes/pages/add_note_page.dart';
 import 'package:notes/widgets/custom_text.dart';
-import 'package:notes/widgets/custom_textfield.dart';
 
 class NotePage extends StatefulWidget {
   const NotePage({super.key});
@@ -68,137 +68,149 @@ class _NotePageState extends State<NotePage> {
                   int.parse(mData[index].nCreatedAt),
                 );
                 return Padding(
-                  padding: const EdgeInsets.all(3.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color: colorList[index]['color'],
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(15),
-                      child: Column(
-                        children: [
-                          Text(
-                            mData[index].nTitle,
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
+                  padding: const EdgeInsets.all(5.0),
+                  child: GestureDetector(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        color: colorList[index]['color'],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(15),
+                        child: Column(
+                          children: [
+                            Text(
+                              mData[index].nTitle,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          Text(
-                            mData[index].nDescription,
-                            style: const TextStyle(
-                              color: Colors.black54,
-                              fontSize: 22,
-                              fontWeight: FontWeight.w800,
+                            const SizedBox(
+                              height: 5,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                          Text(
-                            df.format(eachDate),
-                            style: const TextStyle(
-                              color: Colors.black54,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
+                            Text(
+                              mData[index].nDescription,
+                              style: const TextStyle(
+                                color: Colors.black87,
+                                fontSize: 22,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
+                            Text(
+                              df.format(eachDate),
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
+                    onLongPress: () {
+                      showDialog(
+                        context: context,
+                        builder: (_) {
+                          return AlertDialog(
+                            backgroundColor: colorList[index]['color'],
+                            title: Text(
+                              "Options",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 20,
+                                color: Colors.black,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            content: SizedBox(
+                              height: 80,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  Column(
+                                    children: [
+                                      CustomText(
+                                        text: "Edit",
+                                        size: 18,
+                                        textColor: Colors.black,
+                                      ),
+                                      IconButton(
+                                        onPressed: () {},
+                                        icon: Icon(
+                                          Icons.edit,
+                                          color: Colors.black,
+                                          size: 30,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Column(
+                                    children: [
+                                      CustomText(
+                                        text: "Delete",
+                                        size: 18,
+                                        textColor: Colors.black,
+                                      ),
+                                      IconButton(
+                                        onPressed: () async {
+                                          await mDb!.deleteNoteById(
+                                              mData[index].nId!);
+                                          getAllNotes();
+                                          // ignore: use_build_context_synchronously
+                                          Navigator.of(context).pop();
+                                        },
+                                        icon: Icon(
+                                          Icons.delete,
+                                          color: Colors.black,
+                                          size: 30,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
                   ),
                 );
               },
             )
           : Center(
-              child: CustomText(
-                text: 'No Notes Available',
-                size: 20,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    "assets/logo/out-of-stock.png",
+                    width: 250,
+                  ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  CustomText(
+                    text: "No Notes found...",
+                    size: 25,
+                  ),
+                ],
               ),
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          titleController.clear();
-          descriptionController.clear();
-          showModalBottomSheet(
-              context: context,
-              builder: (_) {
-                return Container(
-                  padding: EdgeInsets.all(15),
-                  width: double.infinity,
-                  height: 300,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20),
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      CustomText(
-                        text: 'Add Note',
-                        size: 20,
-                      ),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      CustomTextfield(
-                        hint: 'Note Title',
-                        controller: titleController,
-                      ),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      CustomTextfield(
-                        hint: 'Note Description',
-                        controller: descriptionController,
-                      ),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          OutlinedButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: Text('Cancel'),
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          OutlinedButton(
-                            onPressed: () async {
-                              bool check = await mDb!.addNote(
-                                newNote: NoteModel(
-                                  nTitle: titleController.text,
-                                  nDescription: descriptionController.text,
-                                  nCreatedAt: DateTime.now()
-                                      .microsecondsSinceEpoch
-                                      .toString(),
-                                ),
-                              );
-                              if (check) {
-                                getAllNotes();
-                                // ignore: use_build_context_synchronously
-                                Navigator.pop(context);
-                              }
-                            },
-                            child: Text('Save'),
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                );
-              });
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AddNotePage(),
+            ),
+          );
         },
         child: Icon(Icons.add),
       ),
