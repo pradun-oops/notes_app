@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:notes/models/db_helper.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:intl/intl.dart';
+import 'package:notes/color/color_list.dart';
+import 'package:notes/helper/db_helper.dart';
+import 'package:notes/models/model.dart';
+import 'package:notes/widgets/custom_text.dart';
+import 'package:notes/widgets/custom_textfield.dart';
 
 class NotePage extends StatefulWidget {
   const NotePage({super.key});
@@ -11,49 +17,114 @@ class NotePage extends StatefulWidget {
 class _NotePageState extends State<NotePage> {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
-  List<Map<String, dynamic>> notes = [];
+
+  List<NoteModel> mData = [];
   DbHelper? mDb;
+
+  DateFormat df = DateFormat.yMMMEd();
 
   @override
   void initState() {
     super.initState();
     mDb = DbHelper.getInstance();
-    getNotes();
+    getAllNotes();
   }
 
-  void getNotes() async {
-    notes = await mDb!.getNotes();
+  void getAllNotes() async {
+    mData = await mDb!.fetchAllNotes();
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Text(
-          'Note Page',
+        backgroundColor: Colors.black,
+        title: CustomText(
+          text: 'Notes',
+          size: 30,
         ),
-        centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: Icon(
+              Icons.search,
+              size: 30,
+              color: Colors.white,
+            ),
+          ),
+        ],
       ),
-      body: notes.isEmpty
-          ? ListView.builder(
-              itemCount: notes.length,
+      body: mData.isNotEmpty
+          ? MasonryGridView.builder(
+              itemCount: mData.length,
+              gridDelegate:
+                  const SliverSimpleGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+              ),
               itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(
-                    notes[index][DbHelper.COULMN_NOTE_TITLE],
-                  ),
-                  subtitle: Text(
-                    notes[index][DbHelper.COULMN_NOTE_DESCRIPTION],
+                var eachDate = DateTime.fromMicrosecondsSinceEpoch(
+                  int.parse(mData[index].nCreatedAt),
+                );
+                return Padding(
+                  padding: const EdgeInsets.all(3.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: colorList[index]['color'],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(15),
+                      child: Column(
+                        children: [
+                          Text(
+                            mData[index].nTitle,
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            mData[index].nDescription,
+                            style: const TextStyle(
+                              color: Colors.black54,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w800,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          Text(
+                            df.format(eachDate),
+                            style: const TextStyle(
+                              color: Colors.black54,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 );
               },
             )
           : Center(
-              child: Text('No notes found'),
+              child: CustomText(
+                text: 'No Notes Available',
+                size: 20,
+              ),
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
+          titleController.clear();
+          descriptionController.clear();
           showModalBottomSheet(
               context: context,
               builder: (_) {
@@ -70,46 +141,23 @@ class _NotePageState extends State<NotePage> {
                   ),
                   child: Column(
                     children: [
-                      Text(
-                        "Add new Note",
-                        style: TextStyle(
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      CustomText(
+                        text: 'Add Note',
+                        size: 20,
                       ),
                       const SizedBox(
                         height: 15,
                       ),
-                      TextField(
+                      CustomTextfield(
+                        hint: 'Note Title',
                         controller: titleController,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          hintText: "Note title",
-                          hintStyle: TextStyle(
-                            color: Colors.black,
-                            fontSize: 16,
-                          ),
-                          contentPadding: EdgeInsets.only(left: 15),
-                        ),
                       ),
                       const SizedBox(
                         height: 15,
                       ),
-                      TextField(
+                      CustomTextfield(
+                        hint: 'Note Description',
                         controller: descriptionController,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          hintText: "Note Description",
-                          hintStyle: TextStyle(
-                            color: Colors.black,
-                            fontSize: 16,
-                          ),
-                          contentPadding: EdgeInsets.only(left: 15),
-                        ),
                       ),
                       const SizedBox(
                         height: 15,
@@ -129,12 +177,18 @@ class _NotePageState extends State<NotePage> {
                           OutlinedButton(
                             onPressed: () async {
                               bool check = await mDb!.addNote(
-                                title: titleController.text,
-                                description: descriptionController.text,
+                                newNote: NoteModel(
+                                  nTitle: titleController.text,
+                                  nDescription: descriptionController.text,
+                                  nCreatedAt: DateTime.now()
+                                      .microsecondsSinceEpoch
+                                      .toString(),
+                                ),
                               );
                               if (check) {
-                                getNotes();
-                                Navigator.pop(_);
+                                getAllNotes();
+                                // ignore: use_build_context_synchronously
+                                Navigator.pop(context);
                               }
                             },
                             child: Text('Save'),
