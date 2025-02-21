@@ -62,12 +62,20 @@ class DbHelper {
     return allNotes;
   }
 
-  Future<int> deleteNoteById(int id) async {
-    final db = await getDb();
-    return await db.delete(
-      TABLE_NOTE,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+  Future<bool> updateNote(NoteModel updatedNote) async {
+    var db = await getDb();
+    int rowsEffected = await db.update(TABLE_NOTE, updatedNote.toMap(),
+        where: "$COLUMN_NOTE_ID = ?", whereArgs: ["${updatedNote.nId}"]);
+
+    return rowsEffected > 0;
+  }
+
+  Future<bool> deleteNote(int id) async {
+    var db = await getDb();
+
+    int rowsEffected =
+        await db.delete(TABLE_NOTE, where: "$COLUMN_NOTE_ID = $id");
+
+    return rowsEffected > 0;
   }
 }

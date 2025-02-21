@@ -4,7 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:notes/color/color_list.dart';
 import 'package:notes/helper/db_helper.dart';
 import 'package:notes/models/model.dart';
-import 'package:notes/pages/add_note_page.dart';
+import 'package:notes/pages/update_note_page.dart';
+import 'package:notes/route/page_route.dart';
 import 'package:notes/widgets/custom_text.dart';
 
 class NotePage extends StatefulWidget {
@@ -17,6 +18,8 @@ class NotePage extends StatefulWidget {
 class _NotePageState extends State<NotePage> {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
+  TextEditingController updatedTitleController = TextEditingController();
+  TextEditingController updatedDescriptionController = TextEditingController();
 
   List<NoteModel> mData = [];
   DbHelper? mDb;
@@ -142,7 +145,17 @@ class _NotePageState extends State<NotePage> {
                                         textColor: Colors.black,
                                       ),
                                       IconButton(
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  UpdateNotePage(
+                                                id: mData[index].nId,
+                                              ),
+                                            ),
+                                          );
+                                        },
                                         icon: Icon(
                                           Icons.edit,
                                           color: Colors.black,
@@ -160,8 +173,8 @@ class _NotePageState extends State<NotePage> {
                                       ),
                                       IconButton(
                                         onPressed: () async {
-                                          await mDb!.deleteNoteById(
-                                              mData[index].nId!);
+                                          await mDb!
+                                              .deleteNote(mData[index].nId!);
                                           getAllNotes();
                                           // ignore: use_build_context_synchronously
                                           Navigator.of(context).pop();
@@ -205,12 +218,7 @@ class _NotePageState extends State<NotePage> {
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AddNotePage(),
-            ),
-          );
+          Navigator.pushNamed(context, AppRoutes.ROUTE_ADD_NOTE);
         },
         child: Icon(Icons.add),
       ),
