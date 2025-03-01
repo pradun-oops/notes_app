@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:notes/helper/db_helper.dart';
 import 'package:notes/models/model.dart';
+import 'package:notes/provider/db_provider.dart';
 import 'package:notes/widgets/custom_text.dart';
 import 'package:notes/widgets/custom_textfield.dart';
+import 'package:provider/provider.dart';
 
+// ignore: must_be_immutable
 class UpdateNotePage extends StatefulWidget {
   final String? title;
   final String? desc;
@@ -86,19 +89,20 @@ class _UpdateNotePageState extends State<UpdateNotePage> {
               ),
               OutlinedButton(
                 onPressed: () async {
-                  bool check = await mDb!.updateNote(
-                    NoteModel(
-                      nTitle: updatedTitleController.text,
-                      nDescription: updatedDescriptionController.text,
-                      nCreatedAt:
-                          DateTime.now().microsecondsSinceEpoch.toString(),
-                      nId: widget.id,
-                    ),
-                  );
-                  if (check) {
-                    // ignore: use_build_context_synchronously
-                    Navigator.pop(context);
+                  if (updatedDescriptionController.text.isEmpty &&
+                      updatedTitleController.text.isEmpty) {
+                    context.read<DbProvider>().updateNote(
+                          NoteModel(
+                            nTitle: updatedTitleController.text,
+                            nDescription: updatedDescriptionController.text,
+                            nCreatedAt: DateTime.now()
+                                .microsecondsSinceEpoch
+                                .toString(),
+                            nId: widget.id,
+                          ),
+                        );
                   }
+                  Navigator.pop(context);
                 },
                 child: CustomText(
                   text: "Update",

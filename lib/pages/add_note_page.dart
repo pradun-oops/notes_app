@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:notes/helper/db_helper.dart';
 import 'package:notes/models/model.dart';
+import 'package:notes/provider/db_provider.dart';
 
 import 'package:notes/widgets/custom_text.dart';
 import 'package:notes/widgets/custom_textfield.dart';
+import 'package:provider/provider.dart';
 
 class AddNotePage extends StatefulWidget {
   const AddNotePage({
@@ -84,18 +86,19 @@ class _AddNotePageState extends State<AddNotePage> {
               ),
               OutlinedButton(
                 onPressed: () async {
-                  bool check = await mDb!.addNote(
-                    newNote: NoteModel(
-                      nTitle: titleController.text,
-                      nDescription: descriptionController.text,
-                      nCreatedAt:
-                          DateTime.now().microsecondsSinceEpoch.toString(),
-                    ),
-                  );
-                  if (check) {
-                    // ignore: use_build_context_synchronously
-                    Navigator.pop(context);
+                  if (titleController.text.isNotEmpty &&
+                      descriptionController.text.isNotEmpty) {
+                    context.read<DbProvider>().addNote(
+                          NoteModel(
+                            nTitle: titleController.text,
+                            nDescription: descriptionController.text,
+                            nCreatedAt: DateTime.now()
+                                .microsecondsSinceEpoch
+                                .toString(),
+                          ),
+                        );
                   }
+                  Navigator.pop(context);
                 },
                 child: CustomText(
                   text: "Save",
