@@ -1,0 +1,2 @@
+/home/pradun/Downloads/notes_app/android/app/.cxx/Debug/f6p1r172/x86/CMakeFiles/edit_cache.dir
+/home/pradun/Downloads/notes_app/android/app/.cxx/Debug/f6p1r172/x86/CMakeFiles/rebuild_cache.dir
