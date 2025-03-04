@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: AppRoutes.ROUTE_NOTE,
+      initialRoute: AppRoutes.ROUTE_SPLASH,
       routes: AppRoutes.getRoute(),
     );
   }

@@ -89,8 +89,8 @@ class _UpdateNotePageState extends State<UpdateNotePage> {
               ),
               OutlinedButton(
                 onPressed: () async {
-                  if (updatedDescriptionController.text.isEmpty &&
-                      updatedTitleController.text.isEmpty) {
+                  if (updatedDescriptionController.text.isNotEmpty &&
+                      updatedTitleController.text.isNotEmpty) {
                     context.read<DbProvider>().updateNote(
                           NoteModel(
                             nTitle: updatedTitleController.text,

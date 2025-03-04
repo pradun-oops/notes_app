@@ -113,51 +113,75 @@ class _NotePageState extends State<NotePage> {
                             ),
                           ),
                         ),
+                        onTap: () {
+                          Navigator.pushNamed(
+                              context, AppRoutes.ROUTE_DETAIL_PAGE,
+                              arguments: mData[index]);
+                        },
                         onLongPress: () {
                           showBottomSheet(
+                            backgroundColor: Colors.black,
                             context: context,
-                            builder: (context) {
-                              return Container(
-                                height: 100,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                UpdateNotePage(
-                                              id: mData[index].nId,
+                            builder: (BuildContext context) {
+                              return Padding(
+                                padding: const EdgeInsets.all(15.0),
+                                child: Container(
+                                  width: double.infinity,
+                                  height: 120,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(color: Colors.black),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  UpdateNotePage(
+                                                id: mData[index].nId,
+                                              ),
                                             ),
+                                          );
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(15),
                                           ),
-                                        );
-                                      },
-                                      child: CustomText(
-                                        text: "Edit",
-                                        textColor: Colors.black,
-                                        size: 20,
+                                        ),
+                                        child: CustomText(
+                                          text: "Edit",
+                                          textColor: Colors.black,
+                                          size: 25,
+                                        ),
                                       ),
-                                    ),
-                                    ElevatedButton(
-                                      onPressed: () async {
-                                        context.read<DbProvider>().deleteNote(
-                                              mData[index].nId!,
-                                            );
-                                        Navigator.pop(context);
-                                      },
-                                      child: CustomText(
-                                        text: "Delete",
-                                        textColor: Colors.black,
-                                        size: 20,
+                                      ElevatedButton(
+                                        onPressed: () async {
+                                          context.read<DbProvider>().deleteNote(
+                                                mData[index].nId!,
+                                              );
+                                          Navigator.pop(context);
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                          ),
+                                        ),
+                                        child: CustomText(
+                                          text: "Delete",
+                                          textColor: Colors.black,
+                                          size: 25,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               );
                             },
